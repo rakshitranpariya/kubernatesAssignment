@@ -1,0 +1,93 @@
+# PersistentVolumeClaim definition
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+# Deployment and Service for App 1
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app-1
+  template:
+    metadata:
+      labels:
+        app: my-app-1
+    spec:
+      containers:
+        - name: app-1
+          image: us-central1-docker.pkg.dev/k8s-assignment-390205/k8s-app-1/k8s-app-1:latest
+          ports:
+            - containerPort: 6000
+          volumeMounts:
+            - name: pv-volume
+              mountPath: /vatsal_PV_dir
+      volumes:
+        - name: pv-volume
+          persistentVolumeClaim:
+            claimName: pv-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-1-service
+spec:
+  selector:
+    app: my-app-1
+  ports:
+    - protocol: TCP
+      port: 6000
+      targetPort: 6000
+
+# Deployment and Service for App 2
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app2-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app-2
+  template:
+    metadata:
+      labels:
+        app: my-app-2
+    spec:
+      containers:
+        - name: app-2
+          image: us-central1-docker.pkg.dev/k8s-assignment-390205/k8s-app-2/k8s-app-2:latest
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: pv-volume
+              mountPath: /vatsal_PV_dir
+      volumes:
+        - name: pv-volume
+          persistentVolumeClaim:
+            claimName: pv-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-2-service
+spec:
+  selector:
+    app: my-app-2
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

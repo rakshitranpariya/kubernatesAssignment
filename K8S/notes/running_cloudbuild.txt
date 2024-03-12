@@ -1,0 +1,31 @@
+steps:
+  # Step 1: Install dependencies and build application
+  - name: "gcr.io/cloud-builders/npm"
+    args: ["install"]
+
+  - name: "gcr.io/cloud-builders/npm"
+    args: ["run", "build"]
+
+  # Step 2: Build and push Docker image to Google Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "us-central1-docker.pkg.dev/$PROJECT_ID/artifactregistry1/container1:$SHORT_SHA",
+        ".",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "push",
+        "us-central1-docker.pkg.dev/$PROJECT_ID/artifactregistry1/container1:$SHORT_SHA",
+      ]
+
+  # Step 3: Deploy Pods to Kubernetes
+#   - name: "gcr.io/cloud-builders/kubectl"
+#     args: ["apply", "-f", "./deployment.yaml"]
+
+# images:
+#   - "us-central1-docker.pkg.dev/$PROJECT_ID/artifactregistry1/container1:$SHORT_SHA"

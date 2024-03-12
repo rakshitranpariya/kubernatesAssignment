@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: app-1
+          image: us-central1-docker.pkg.dev/cloudcompk8/artifactregistry1/container1:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6000
+          volumeMounts:
+            - name: pv-volume
+              mountPath: /rakshit_PV_dir
+        - name: app-2
+          image: us-central1-docker.pkg.dev/cloudcompk8/artifactregistry2/container2:latest
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: pv-volume
+              mountPath: /rakshit_PV_dir
+      volumes:
+        - name: pv-volume
+          persistentVolumeClaim:
+            claimName: pv-claim
